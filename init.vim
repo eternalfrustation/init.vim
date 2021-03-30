@@ -23,9 +23,10 @@ if dein#load_state('/root/.config/nvim/packages')
   call dein#add('dracula/vim')
   call dein#add('Krasjet/auto.pairs')
   call dein#add('prabirshrestha/vim-lsp')
-  "call dein#add('justinmk/vim-dirvish')
+  call dein#add('Shougo/defx.nvim')
   call dein#add('ervandew/supertab')
   call dein#add('luochen1990/rainbow')
+"  call dein#add('ryanoasis/vim-devicons')
   " Required:
   call dein#end()
   call dein#save_state()
@@ -54,6 +55,9 @@ augroup LspGo
 augroup ENDcolorscheme landscape
 colorscheme dracula
 set guifont=Hack
+let g:lightline = {
+			\ 'colorscheme' : 'dracula'
+			\}
 let g:rainbow_active=1
 let g:netrw_banner=0
 let g:netrw_liststyle=3
@@ -61,3 +65,4 @@ let g:netrw_browse_split=4
 let g:netrw_winsize=25
 let g:netrw_altv=1
 nnoremap <C-e> :Vex<CR>
+
