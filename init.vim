@@ -65,4 +65,4 @@ let g:netrw_browse_split=4
 let g:netrw_winsize=25
 let g:netrw_altv=1
 nnoremap <C-e> :Vex<CR>
-
+set noshowmode
