@@ -52,6 +52,14 @@ augroup LspGo
   autocmd FileType go nmap <buffer> gd <plug>(lsp-definition)
   autocmd FileType go nmap <buffer> ,n <plug>(lsp-next-error)
   autocmd FileType go nmap <buffer> ,p <plug>(lsp-previous-error)
+if executable('rls')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'rls',
+        \ 'cmd': {server_info->['rustup', 'run', 'stable', 'rls']},
+        \ 'workspace_config': {'rust': {'clippy_preference': 'on'}},
+        \ 'whitelist': ['rust'],
+        \ })
+endif
 augroup ENDcolorscheme landscape
 colorscheme dracula
 set guifont=Hack
