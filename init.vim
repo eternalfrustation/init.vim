@@ -23,10 +23,11 @@ if dein#load_state('/root/.config/nvim/packages')
   call dein#add('dracula/vim')
   call dein#add('Krasjet/auto.pairs')
   call dein#add('prabirshrestha/vim-lsp')
-  call dein#add('Shougo/defx.nvim')
   call dein#add('ervandew/supertab')
   call dein#add('luochen1990/rainbow')
-"  call dein#add('ryanoasis/vim-devicons')
+  call dein#add('kyazdani42/nvim-web-devicons')
+  call dein#add('kyazdani42/nvim-tree.lua')
+
   " Required:
   call dein#end()
   call dein#save_state()
@@ -72,10 +73,20 @@ let g:lightline = {
 			\ 'colorscheme' : 'dracula'
 			\}
 let g:rainbow_active=1
-let g:netrw_banner=0
-let g:netrw_liststyle=3
-let g:netrw_browse_split=4
-let g:netrw_winsize=25
-let g:netrw_altv=1
-nnoremap <C-e> :Vex<CR>
 set noshowmode
+nnoremap <C-n> :NvimTreeToggle<CR>
+nnoremap <leader>r :NvimTreeRefresh<CR>
+nnoremap <leader>n :NvimTreeFindFile<CR>
+let g:nvim_tree_width = 25
+let g:nvim_tree_auto_open = 1 
+let g:nvim_tree_auto_close = 1
+let g:nvim_tree_follow = 1
+let g:nvim_tree_indent_markers = 1
+let g:nvim_tree_git_hl = 1
+let g:nvim_tree_special_files = { 'README.md': 1, 'Makefile': 1, 'MAKEFILE': 1 } " List of filenames that gets highlighted with NvimTreeSpecialFile
+let g:nvim_tree_show_icons = {
+    \ 'git': 1,
+    \ 'folders': 1,
+    \ 'files': 1,
+    \ 'folder_arrows': 1,
+    \ }
