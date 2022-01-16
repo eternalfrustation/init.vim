@@ -5,43 +5,10 @@ set autochdir
 if &compatible
   set nocompatible               " Be iMproved
 endif
-
-" Required:
-set runtimepath+=/root/.config/nvim/packages/repos/github.com/Shougo/dein.vim
-" Required:
-if dein#load_state('/root/.config/nvim/packages')
-  call dein#begin('/root/.config/nvim/packages')
-
-  " Let dein manage dein
-  " Required:
-  call dein#add('/root/.config/nvim/packages/repos/github.com/Shougo/dein.vim')
-
-  " Add or remove your plugins here like this:
-  "call dein#add('Shougo/neosnippet.vim')
-  "call dein#add('Shougo/neosnippet-snippets')
-  call dein#add('itchyny/lightline.vim')
-  call dein#add('dracula/vim')
-  call dein#add('neovim/nvim-lspconfig')
-  call dein#add('Krasjet/auto.pairs')
-  call dein#add('ervandew/supertab')
-  call dein#add('luochen1990/rainbow')
-  call dein#add('kyazdani42/nvim-web-devicons')
-  call dein#add('kyazdani42/nvim-tree.lua')
-
-  " Required:
-  call dein#end()
-  call dein#save_state()
-endif
 let g:SuperTabDefaultCompletionType="<C-x><C-o>"
 " Required:
 filetype plugin indent on
 syntax enable
-
-" If you want to install not installed plugins on startup.
-"if dein#check_install()
-"  call dein#install()
-"endif
-"End dein Scripts-------------------------
 colorscheme dracula
 set guifont=Hack
 let g:lightline = {
@@ -53,9 +20,6 @@ nnoremap <C-n> :NvimTreeToggle<CR>
 nnoremap <leader>r :NvimTreeRefresh<CR>
 nnoremap <leader>n :NvimTreeFindFile<CR>
 let g:nvim_tree_width = 25
-let g:nvim_tree_auto_open = 1 
-let g:nvim_tree_auto_close = 1
-let g:nvim_tree_follow = 1
 let g:nvim_tree_indent_markers = 1
 let g:nvim_tree_git_hl = 1
 let g:nvim_tree_special_files = { 'README.md': 1, 'Makefile': 1, 'MAKEFILE': 1 } " List of filenames that gets highlighted with NvimTreeSpecialFile
@@ -112,4 +76,7 @@ for _, lsp in ipairs(servers) do
     }
   }
 end
+require'nvim-tree'.setup {
+	open_on_setup = false
+}
 EOF
