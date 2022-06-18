@@ -8,3 +8,4 @@ git clone --depth 1 https://github.com/ervandew/supertab "${plugin_dir}supertab/
 git clone --depth 1 https://github.com/luochen1990/rainbow "${plugin_dir}rainbow/"
 git clone --depth 1 https://github.com/kyazdani42/nvim-web-devicons "${plugin_dir}devicons/"
 git clone --depth 1 https://github.com/kyazdani42/nvim-tree.lua "${plugin_dir}nvim-tree/"
+git clone --depth 1 https://github.com/L3MON4D3/LuaSnip "${plugin_dir}nvim-tree/"
