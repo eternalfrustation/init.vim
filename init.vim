@@ -2,9 +2,13 @@ set nu
 set mouse=a
 set clipboard^=unnamed,unnamedplus
 set autochdir
+set autoread
+set completeopt=menu,menuone,noselect
+let g:neovide_transparency=0.7
 if &compatible
   set nocompatible               " Be iMproved
 endif
+
 let g:SuperTabDefaultCompletionType="<C-x><C-o>"
 let g:neovide_refresh_rate=30
 let g:terminal_type="xterm"
@@ -27,7 +31,7 @@ smap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' 
 filetype plugin indent on
 syntax enable
 colorscheme dracula
-set guifont=Hasklug\ NF:h13
+set guifont=FantasqueSansMono\ Nerd\ Font:h13
 let g:lightline = {
 			\ 'colorscheme' : 'dracula'
 			\}
@@ -157,111 +161,17 @@ function! s:getWinPos(width, height) abort
     return [row, col, vert, hor]
 endfunction
 nnoremap <C-A> :call ToggleTerminal(&columns - 5, 20)<CR>
+let g:tex_flavor='latex'
+let g:vimtex_view_method='zathura'
+let g:vimtex_quickfix_mode=0
+set conceallevel=1
+let g:tex_conceal='abdmg'
+let g:vimtex_view_method = 'sioyek'
+let g:vimtex_compiler_method = 'tectonic'
+
+
 lua << EOF
-local opts = { noremap=true, silent=true }
-vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
-vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
-
-local on_attach = function(client, bufnr)
-  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-  local bufopts = { noremap=true, silent=true, buffer=bufnr}
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-  vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-  vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-  vim.keymap.set('n', '<space>wl', function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, bufopts)
-  vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
-  vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
-  vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<space>f', vim.lsp.buf.format, bufopts)
-end
-vim.cmd [[autocmd! ColorScheme * highlight NormalFloat guibg=#1f2335]]
-vim.cmd [[autocmd! ColorScheme * highlight FloatBorder guifg=white guibg=#1f2335]]
-
-local border = {
-      {"🭽", "FloatBorder"},
-      {"▔", "FloatBorder"},
-      {"🭾", "FloatBorder"},
-      {"▕", "FloatBorder"},
-      {"🭿", "FloatBorder"},
-      {"▁", "FloatBorder"},
-      {"🭼", "FloatBorder"},
-      {"▏", "FloatBorder"},
-}
-local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
-function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
-  opts = opts or {}
-  opts.border = opts.border or border
-  return orig_util_open_floating_preview(contents, syntax, opts, ...)
-end
-local servers = { "gopls", "rls" }
-for _, lsp in ipairs(servers) do
-  require('lspconfig')[lsp].setup {
-    on_attach = on_attach,
-    flags = lsp_flags
-  }
-end
-require("nvim-tree").setup({
-      auto_reload_on_write = true,
-      hijack_cursor = true,
-      hijack_netrw = true,
-      update_cwd = true,
-      open_on_setup_file = true,
-      respect_buf_cwd = true,
-      sort_by = "extension",
-      update_focused_file = {
-	      enable = true,
-	      update_root = true,
-      },
-      view = {
-        adaptive_size = true,
-        mappings = {
-          list = {
-            { key = "u", action = "dir_up" },
-          },
-        },
-      },
-      renderer = {
-        group_empty = true,
-      },
-      filters = {
-        dotfiles = true,
-      },
-      actions = {
-        use_system_clipboard = true,
-        change_dir = {
-          enable = true,
-          global = false,
-          restrict_above_cwd = false,
-        },
-        expand_all = {
-          max_folder_discovery = 300,
-        },
-        open_file = {
-          quit_on_open = false,
-          resize_window = true,
-          window_picker = {
-            enable = true,
-            chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
-            exclude = {
-              filetype = { "notify", "packer", "qf", "diff", "fugitive", "fugitiveblame" },
-              buftype = { "nofile", "terminal", "help" },
-            },
-          },
-        },
-        remove_file = {
-          close_window = true,
-        },
-      },
-})
+require("snips")
+require("lua_conf")
 EOF
 
