@@ -1,7 +1,7 @@
 #!/bin/bash
 plugin_dir=~/.local/share/nvim/site/pack/frustated/start/
 rm -rf $plugin_dir
-git clone --depth 1 https://github.com/itchyny/lightline.vim "${plugin_dir}lightline/"
+git clone --depth 1 https://github.com/nvim-lualine/lualine.nvim "${plugin_dir}lualine/"
 git clone --depth 1 https://github.com/dracula/vim "${plugin_dir}dracula/"
 git clone --depth 1 https://github.com/neovim/nvim-lspconfig "${plugin_dir}lspconfig/"
 git clone --depth 1 https://github.com/Krasjet/auto.pairs "${plugin_dir}auto-pairs/"

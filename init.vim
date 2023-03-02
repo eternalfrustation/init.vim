@@ -19,9 +19,6 @@ syntax enable
 colorscheme dracula
 highlight Normal ctermbg=NONE guibg=NONE
 set guifont=FantasqueSansMono\ Nerd\ Font:h13
-let g:lightline = {
-			\ 'colorscheme' : 'dracula'
-			\}
 let g:rainbow_active=1
 set noshowmode
 nnoremap <C-n> :NvimTreeToggle<CR>

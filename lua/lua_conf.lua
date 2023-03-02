@@ -158,3 +158,7 @@ parser_config.gotmpl = {
   filetype = "gotmpl",
   used_by = {"gohtmltmpl", "gotexttmpl", "gotmpl", "yaml"}
 }
+
+require('lualine').setup {
+  options = { theme  = 'dracula' },
+}
