@@ -4,7 +4,23 @@ vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
 vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
+local function open_nvim_tree(data)
 
+  -- buffer is a real file on the disk
+  local real_file = vim.fn.filereadable(data.file) == 1
+
+  -- buffer is a [No Name]
+  local no_name = data.file == "" and vim.bo[data.buf].buftype == ""
+
+  -- only files please
+  if not real_file and not no_name then
+    return
+  end
+
+  -- open the tree but don't focus it
+  require("nvim-tree.api").tree.toggle({ focus = false })
+end
+vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
 local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
@@ -56,7 +72,6 @@ require("nvim-tree").setup({
       hijack_cursor = true,
       hijack_netrw = true,
       update_cwd = true,
-      open_on_setup_file = true,
       respect_buf_cwd = true,
       sort_by = "extension",
       update_focused_file = {
