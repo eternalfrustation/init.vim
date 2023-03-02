@@ -44,7 +44,7 @@ function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
   opts.border = opts.border or border
   return orig_util_open_floating_preview(contents, syntax, opts, ...)
 end
-local servers = { "gopls", "rust_analyzer", "clangd" }
+local servers = { "gopls", "rust_analyzer", "clangd", "eslint", "denols" }
 for _, lsp in ipairs(servers) do
   require('lspconfig')[lsp].setup {
     on_attach = on_attach,
@@ -112,8 +112,6 @@ require'nvim-treesitter.configs'.setup {
   sync_install = false,
 
   -- List of parsers to ignore installing (for "all")
-  ignore_install = { "javascript" },
-
   highlight = {
     -- `false` will disable the whole extension
     enable = true,
@@ -136,3 +134,12 @@ require'nvim-treesitter.configs'.setup {
     ...
 
   }
+local parser_config = require'nvim-treesitter.parsers'.get_parser_configs()
+parser_config.gotmpl = {
+  install_info = {
+    url = "https://github.com/ngalaiko/tree-sitter-go-template",
+    files = {"src/parser.c"}
+  },
+  filetype = "gotmpl",
+  used_by = {"gohtmltmpl", "gotexttmpl", "gotmpl", "yaml"}
+}

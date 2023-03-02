@@ -1,7 +1,6 @@
 set nu
 set mouse=a
-set clipboard^=unnamed,unnamedplus
-set autochdir
+set clipboard+=unnamedplus
 set autoread
 set completeopt=menu,menuone,noselect
 let g:neovide_transparency=0.7
@@ -18,6 +17,7 @@ let g:neovide_floating_blur_amount_y = 2.0
 filetype plugin indent on
 syntax enable
 colorscheme dracula
+highlight Normal ctermbg=NONE guibg=NONE
 set guifont=FantasqueSansMono\ Nerd\ Font:h13
 let g:lightline = {
 			\ 'colorscheme' : 'dracula'
@@ -161,4 +161,14 @@ lua << EOF
 require("snips")
 require("lua_conf")
 EOF
+function DetectGoHtmlTmpl()
+    if expand('%:e') == "html" && search("{{") != 0
+        setfiletype gohtmltmpl
+    endif
+endfunction
+
+augroup filetypedetect
+    " gohtmltmpl
+    au BufRead,BufNewFile *.html call DetectGoHtmlTmpl()
+augroup END
 

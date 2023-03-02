@@ -1,3 +1,4 @@
+#!/bin/bash
 plugin_dir=~/.local/share/nvim/site/pack/frustated/start/
 rm -rf $plugin_dir
 git clone --depth 1 https://github.com/itchyny/lightline.vim "${plugin_dir}lightline/"
