@@ -1,12 +1,16 @@
 set nu
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
 set mouse=a
 set clipboard+=unnamedplus
 set autoread
 set completeopt=menu,menuone,noselect
+set nofoldenable
 let g:neovide_transparency=0.7
 if &compatible
   set nocompatible               " Be iMproved
 endif
+set laststatus=3
 
 let g:SuperTabDefaultCompletionType="<C-x><C-o>"
 let g:neovide_refresh_rate=30
@@ -168,4 +172,7 @@ augroup filetypedetect
     " gohtmltmpl
     au BufRead,BufNewFile *.html call DetectGoHtmlTmpl()
 augroup END
-
+inoremap <F9> <C-O>za
+nnoremap <F9> za
+onoremap <F9> <C-C>za
+vnoremap <F9> zf
