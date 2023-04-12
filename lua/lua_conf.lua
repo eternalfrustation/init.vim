@@ -60,7 +60,7 @@ opts = opts or {}
 opts.border = opts.border or border
 return orig_util_open_floating_preview(contents, syntax, opts, ...)
 end
-local servers = { "gopls", "rust_analyzer", "clangd", "eslint", "denols" }
+local servers = { "gopls", "rust_analyzer", "clangd", "denols" }
 for _, lsp in ipairs(servers) do
 require('lspconfig')[lsp].setup {
    on_attach = on_attach,

@@ -1,7 +1,7 @@
 set nu
 set foldmethod=expr
 set foldexpr=nvim_treesitter#foldexpr()
-set mouse=a
+set mouse=
 set clipboard+=unnamedplus
 set autoread
 set completeopt=menu,menuone,noselect
@@ -156,7 +156,8 @@ set conceallevel=1
 let g:tex_conceal='abdmg'
 let g:vimtex_view_method = 'sioyek'
 let g:vimtex_compiler_method = 'tectonic'
-
+command Thtml :!prettier -w  %
+command Tcss :!prettier -w --use-tabs  %
 
 lua << EOF
 require("snips")
