@@ -2,7 +2,7 @@
 plugin_dir=~/.local/share/nvim/site/pack/frustated/start/
 rm -rf $plugin_dir
 git clone --depth 1 https://github.com/nvim-lualine/lualine.nvim "${plugin_dir}lualine/"
-git clone --depth 1 https://github.com/dracula/vim "${plugin_dir}dracula/"
+git clone --depth 1 https://github.com/Mofiqul/dracula.nvim "${plugin_dir}dracula/"
 git clone --depth 1 https://github.com/neovim/nvim-lspconfig "${plugin_dir}lspconfig/"
 git clone --depth 1 https://github.com/Krasjet/auto.pairs "${plugin_dir}auto-pairs/"
 git clone --depth 1 https://github.com/luochen1990/rainbow "${plugin_dir}rainbow/"
@@ -21,3 +21,6 @@ git clone --depth 1 https://github.com/dcampos/nvim-snippy "${plugin_dir}nvim-sn
 git clone --depth 1 https://github.com/dcampos/cmp-snippy "${plugin_dir}cmp-snippy/"
 git clone --depth 1 https://github.com/rmagatti/auto-session "${plugin_dir}auto-session/"
 git clone --depth 1 https://github.com/ray-x/cmp-treesitter "${plugin_dir}cmp-treesitter/"
+git clone --depth 1 https://github.com/stevearc/vim-arduino "${plugin_dir}vim-arduino/"
+git clone --depth 1 https://github.com/ray-x/lsp_signature.nvim "${plugin_dir}lsp-signature/"
+

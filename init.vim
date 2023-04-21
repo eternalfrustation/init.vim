@@ -20,7 +20,6 @@ let g:neovide_floating_blur_amount_y = 2.0
 " Required:
 filetype plugin indent on
 syntax enable
-colorscheme dracula
 highlight Normal ctermbg=NONE guibg=NONE
 set guifont=FantasqueSansMono\ Nerd\ Font:h13
 let g:rainbow_active=1

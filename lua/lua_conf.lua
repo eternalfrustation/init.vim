@@ -1,4 +1,8 @@
-
+local dracula = require("dracula")
+dracula.setup({
+	transparent_bg = true,
+})
+vim.cmd[[colorscheme dracula]]
 local opts = { noremap=true, silent=true }
 vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
@@ -54,13 +58,14 @@ local border = {
 {"🭼", "FloatBorder"},
 {"▏", "FloatBorder"},
 }
+require "lsp_signature".on_attach(signature_setup, bufnr)
 local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
 function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
 opts = opts or {}
 opts.border = opts.border or border
 return orig_util_open_floating_preview(contents, syntax, opts, ...)
 end
-local servers = { "gopls", "rust_analyzer", "clangd", "denols" }
+local servers = { "gopls", "rust_analyzer", "clangd", "denols", "arduino_language_server" }
 for _, lsp in ipairs(servers) do
 require('lspconfig')[lsp].setup {
    on_attach = on_attach,
@@ -155,6 +160,7 @@ highlight = {
    additional_vim_regex_highlighting = false,
 },
 }
+
 local parser_config = require'nvim-treesitter.parsers'.get_parser_configs()
 parser_config.gotmpl = {
 install_info = {
@@ -166,6 +172,6 @@ used_by = {"gohtmltmpl", "gotexttmpl", "gotmpl", "yaml"}
 }
 
 require('lualine').setup {
-options = { theme  = 'dracula' },
+options = { theme  = 'dracula-nvim' },
 sections = {lualine_a = {'nvim_treesitter#statusline'}}
 }
