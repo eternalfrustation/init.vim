@@ -1,4 +1,5 @@
 vim.cmd [[ set background=dark ]]
+vim.cmd [[ set laststatus=3 ]]
 vim.cmd [[ colorscheme catppuccin ]]
 vim.cmd [[ set relativenumber ]]
 -- Setup language servers.
@@ -6,6 +7,7 @@ local lspconfig = require('lspconfig')
 lspconfig.gopls.setup {}
 lspconfig.clangd.setup {}
 lspconfig.rust_analyzer.setup {}
+lspconfig.marksman.setup {}
 
 
 -- Global mappings.
@@ -67,3 +69,72 @@ require'nvim-treesitter.configs'.setup {
 }
 
 require("nvim-surround").setup({})
+
+local builtin = require('telescope.builtin')
+vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+vim.keymap.set('n', '<leader>fa', builtin.quickfix, {})
+vim.keymap.set('n', '<leader>fj', builtin.jumplist, {})
+vim.keymap.set('n', '<leader>fd', builtin.diagnostics, {})
+vim.keymap.set('n', '<leader>fs', builtin.treesitter, {})
+
+require'nvim-web-devicons'.setup {
+ -- your personnal icons can go here (to override)
+ -- you can specify color or cterm_color instead of specifying both of them
+ -- DevIcon will be appended to `name`
+ -- globally enable different highlight colors per icon (default to true)
+ -- if set to false all icons will have the default icon's color
+ color_icons = true;
+ -- globally enable default icons (default to false)
+ -- will get overriden by `get_icons` option
+ default = true;
+ -- globally enable "strict" selection of icons - icon will be looked up in
+ -- different tables, first by filename, and if not found by extension; this
+ -- prevents cases when file doesn't have any extension but still gets some icon
+ -- because its name happened to match some extension (default to false)
+ strict = true;
+ -- same as `override` but specifically for overrides by filename
+ -- takes effect when `strict` is true
+ override_by_filename = {
+  [".gitignore"] = {
+    icon = "",
+    color = "#f1502f",
+    name = "Gitignore"
+  }
+ };
+ -- same as `override` but specifically for overrides by extension
+ -- takes effect when `strict` is true
+ override_by_extension = {
+  ["log"] = {
+    icon = "",
+    color = "#81e043",
+    name = "Log"
+  }
+ };
+}
+local npairs = require("nvim-autopairs")
+local Rule = require('nvim-autopairs.rule')
+
+npairs.setup({
+    check_ts = true,
+    ts_config = {
+        lua = {'string'},-- it will not add a pair on that treesitter node
+        javascript = {'template_string'},
+        java = false,-- don't check treesitter on java
+    }
+})
+
+local ts_conds = require('nvim-autopairs.ts-conds')
+
+
+-- press % => %% only while inside a comment or string
+npairs.add_rules({
+  Rule("%", "%", "lua")
+    :with_pair(ts_conds.is_ts_node({'string','comment'})),
+  Rule("$", "$", "lua")
+    :with_pair(ts_conds.is_not_ts_node({'function'}))
+})
+
+require('lualine').setup({})
