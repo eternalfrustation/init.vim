@@ -1,13 +1,17 @@
-vim.cmd [[ set background=dark ]]
-vim.cmd [[ set laststatus=3 ]]
+vim.o.number = true
+vim.o.relativenumber = true
+vim.o.laststatus = 3
+vim.o.background = "dark"
 vim.cmd [[ colorscheme catppuccin ]]
-vim.cmd [[ set relativenumber ]]
+vim.o.completeopt = "menu"
 -- Setup language servers.
 local lspconfig = require('lspconfig')
 lspconfig.gopls.setup {}
 lspconfig.clangd.setup {}
 lspconfig.rust_analyzer.setup {}
+lspconfig.markdown_oxide.setup {}
 lspconfig.marksman.setup {}
+lspconfig.arduino_language_server.setup {}
 
 
 -- Global mappings.
