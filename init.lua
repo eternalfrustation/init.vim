@@ -138,7 +138,59 @@ npairs.add_rules({
     :with_pair(ts_conds.is_ts_node({'string','comment'})),
   Rule("$", "$", "lua")
     :with_pair(ts_conds.is_not_ts_node({'function'}))
-})
+})function installPackages()
+	local config_dir = vim.fn['stdpath']('config')
+	local packagesFilePath = vim.fs.joinpath(config_dir, "packages.list")
+	local packagesFile = io.open(packagesFilePath, "r")
+	if not packagesFile then return end
+	packagesFile:close()
+	local pluginDir = ""
+	if jit.os == "Windows" then
+		pluginDir = vim.fs.joinpath(vim.env.LOCALAPPDATA, "nvim-data", "site", "pack", "frustrated", "start")
+	else
+		if vim.env.XDG_DATA_HOME then
+			pluginDir = vim.fs.joinpath(vim.env.HOME, vim.env.XDG_DATA_HOME, "nvim", "site", "pack", "frustrated", "start")
+		else
+			pluginDir = vim.fs.joinpath(vim.env.HOME, ".local", "share", "nvim", "site", "pack", "frustrated", "start")
+		end
+	end
+	for packagePath in io.lines(packagesFilePath) do
+		local packagePathSplit = {}
+		for e in vim.gsplit(packagePath, "/") do
+			packagePathSplit[#packagePathSplit + 1] = e
+		end
+		local packageName = packagePathSplit[#packagePathSplit]
+		print(os.execute("git clone --recursive "..packagePath.." "..vim.fs.joinpath(pluginDir, packageName)))
+	end
+end
+
+function updatePackages()
+	local config_dir = vim.fn['stdpath']('config')
+	local packagesFilePath = vim.fs.joinpath(config_dir, "packages.list")
+	local packagesFile = io.open(packagesFilePath, "r")
+	if not packagesFile then return end
+	packagesFile:close()
+	local pluginDir = ""
+	if jit.os == "Windows" then
+		pluginDir = vim.fs.joinpath(vim.env.LOCALAPPDATA, "nvim-data", "site", "pack", "frustrated", "start")
+	else
+		if vim.env.XDG_DATA_HOME then
+			pluginDir = vim.fs.joinpath(vim.env.HOME, vim.env.XDG_DATA_HOME, "nvim", "site", "pack", "frustrated", "start")
+		else
+			pluginDir = vim.fs.joinpath(vim.env.HOME, ".local", "share", "nvim", "site", "pack", "frustrated", "start")
+		end
+	end
+	for packagePath in io.lines(packagesFilePath) do
+		local packagePathSplit = {}
+		for e in vim.gsplit(packagePath, "/") do
+			packagePathSplit[#packagePathSplit + 1] = e
+		end
+		local packageName = packagePathSplit[#packagePathSplit]
+		print(os.execute("git pull --recursive "..packagePath.." "..vim.fs.joinpath(pluginDir, packageName)))
+	end
+end
+
+
 
 require('lualine').setup({})
 
