@@ -6,12 +6,20 @@ vim.cmd [[ colorscheme gruvbox ]]
 vim.o.completeopt = "menu"
 -- Setup language servers.
 local lspconfig = require('lspconfig')
-lspconfig.gopls.setup {}
-lspconfig.clangd.setup {}
-lspconfig.rust_analyzer.setup {}
-lspconfig.markdown_oxide.setup {}
-lspconfig.arduino_language_server.setup {}
+local language_servers = { "gopls", "clangd", "rust_analyzer", "arduino_language_server", "html", "cssls", "zls" }
+for _, language_server in ipairs(language_servers) do
+	lspconfig[language_server].setup {
+		capabilities = capabilities,
+	}
+end
+require("lspconfig").markdown_oxide.setup({
+    capabilities = capabilities, 
+    root_dir = lspconfig.util.root_pattern('.git', vim.fn.getcwd()), 
+})
 
+vim.g.neovide_refresh_rate_idle = 1
+
+vim.o.guifont = "0xProto Nerd Font Mono:h14"
 
 -- Global mappings.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
@@ -193,4 +201,11 @@ end
 
 
 require('lualine').setup({})
+-- refresh codelens on TextChanged and InsertLeave as well
+vim.api.nvim_create_autocmd({ 'TextChanged', 'InsertLeave', 'CursorHold', 'LspAttach' }, {
+    buffer = bufnr,
+    callback = vim.lsp.codelens.refresh,
+})
 
+-- trigger codelens refresh
+vim.api.nvim_exec_autocmds('User', { pattern = 'LspAttached' })
