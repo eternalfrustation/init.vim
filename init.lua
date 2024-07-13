@@ -1,12 +1,14 @@
+vim.g.have_nerd_font = true
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.laststatus = 3
 vim.o.background = "dark"
-vim.cmd [[ colorscheme gruvbox ]]
+vim.cmd [[ colorscheme dracula ]]
 vim.o.completeopt = "menu"
+vim.o.mouse = ""
 -- Setup language servers.
 local lspconfig = require('lspconfig')
-local language_servers = { "gopls", "clangd", "rust_analyzer", "arduino_language_server", "html", "cssls", "zls" }
+local language_servers = { "gopls", "clangd", "rust_analyzer", "arduino_language_server", "html", "cssls", "zls", "openscad_lsp", "pylsp", "svelte"}
 for _, language_server in ipairs(language_servers) do
 	lspconfig[language_server].setup {
 		capabilities = capabilities,
@@ -133,7 +135,8 @@ npairs.add_rules({
     :with_pair(ts_conds.is_ts_node({'string','comment'})),
   Rule("$", "$", "lua")
     :with_pair(ts_conds.is_not_ts_node({'function'}))
-})function installPackages()
+})
+function installPackages()
 	local config_dir = vim.fn['stdpath']('config')
 	local packagesFilePath = vim.fs.joinpath(config_dir, "packages.list")
 	local packagesFile = io.open(packagesFilePath, "r")
@@ -188,16 +191,16 @@ end
 
 
 require('lualine').setup({})
--- refresh codelens on TextChanged and InsertLeave as well
-vim.api.nvim_create_autocmd({ 'TextChanged', 'InsertLeave', 'CursorHold', 'LspAttach' }, {
-    buffer = bufnr,
-    callback = vim.lsp.codelens.refresh,
-})
-
--- trigger codelens refresh
-vim.api.nvim_exec_autocmds('User', { pattern = 'LspAttached' })
-
 vim.api.nvim_create_user_command("Time", "pu =strftime('%a %d %b %Y')", {})
 
  
+local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
 
+parser_config.nu = {
+  install_info = {
+    url = "https://github.com/nushell/tree-sitter-nu",
+    files = { "src/parser.c" },
+    branch = "main",
+  },
+  filetype = "nu",
+}
