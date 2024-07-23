@@ -1,14 +1,13 @@
 vim.g.have_nerd_font = true
 vim.o.number = true
 vim.o.relativenumber = true
-vim.o.laststatus = 3
 vim.o.background = "dark"
 vim.cmd [[ colorscheme dracula ]]
 vim.o.completeopt = "menu"
 vim.o.mouse = ""
 -- Setup language servers.
 local lspconfig = require('lspconfig')
-local language_servers = { "gopls", "clangd", "rust_analyzer", "arduino_language_server", "html", "cssls", "zls", "openscad_lsp", "pylsp", "svelte"}
+local language_servers = { "gopls", "clangd", "rust_analyzer", "arduino_language_server", "html", "cssls", "zls", "openscad_lsp", "pylsp", "svelte", "htmx"}
 for _, language_server in ipairs(language_servers) do
 	lspconfig[language_server].setup {
 		capabilities = capabilities,
@@ -204,3 +203,15 @@ parser_config.nu = {
   },
   filetype = "nu",
 }
+
+require('nvim-ts-autotag').setup({
+  opts = {
+    -- Defaults
+    enable_close = true, -- Auto close tags
+    enable_rename = true, -- Auto rename pairs of tags
+    enable_close_on_slash = true -- Auto close on trailing </
+  },
+  -- Also override individual filetype configs, these take priority.
+  -- Empty by default, useful if one of the "opts" global settings
+  -- doesn't work well in a specific filetype
+})
