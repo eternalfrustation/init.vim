@@ -7,16 +7,16 @@ vim.o.completeopt = "menu"
 vim.o.mouse = ""
 -- Setup language servers.
 local lspconfig = require('lspconfig')
-local language_servers = { "gopls", "clangd", "rust_analyzer", "arduino_language_server", "html", "cssls", "zls", "openscad_lsp", "pylsp", "svelte", "htmx"}
+require("lspconfig").markdown_oxide.setup({
+	capabilities = capabilities, 
+	root_dir = lspconfig.util.root_pattern('.git', vim.fn.getcwd()), 
+})
+local language_servers = { "gopls", "clangd", "rust_analyzer", "vale_ls", "arduino_language_server", "html", "cssls", "zls", "openscad_lsp", "pylsp", "svelte", "htmx", "eslint"}
 for _, language_server in ipairs(language_servers) do
 	lspconfig[language_server].setup {
 		capabilities = capabilities,
 	}
 end
-require("lspconfig").markdown_oxide.setup({
-    capabilities = capabilities, 
-    root_dir = lspconfig.util.root_pattern('.git', vim.fn.getcwd()), 
-})
 
 vim.g.neovide_refresh_rate_idle = 1
 
@@ -32,52 +32,52 @@ vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist)
 -- Use LspAttach autocommand to only map the following keys
 -- after the language server attaches to the current buffer
 vim.api.nvim_create_autocmd('LspAttach', {
-  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-  callback = function(ev)
-    -- Enable completion triggered by <c-x><c-o>
-    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+	group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+	callback = function(ev)
+		-- Enable completion triggered by <c-x><c-o>
+		vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
-    -- Buffer local mappings.
-    -- See `:help vim.lsp.*` for documentation on any of the below functions
-    local opts = { buffer = ev.buf }
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-    vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
-    vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
-    vim.keymap.set('n', '<space>wl', function()
-      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    end, opts)
-    vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
-    vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
-    vim.keymap.set({ 'n', 'v' }, '<space>ca', vim.lsp.buf.code_action, opts)
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-    vim.keymap.set('n', '<space>f', function()
-      vim.lsp.buf.format { async = true }
-    end, opts)
-  end,
+		-- Buffer local mappings.
+		-- See `:help vim.lsp.*` for documentation on any of the below functions
+		local opts = { buffer = ev.buf }
+		vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+		vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+		vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+		vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+		vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+		vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
+		vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
+		vim.keymap.set('n', '<space>wl', function()
+			print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+		end, opts)
+		vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
+		vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
+		vim.keymap.set({ 'n', 'v' }, '<space>ca', vim.lsp.buf.code_action, opts)
+		vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+		vim.keymap.set('n', '<space>f', function()
+			vim.lsp.buf.format { async = true }
+		end, opts)
+	end,
 })
 require('telescope').setup()
 
 require('telescope').load_extension('fzy_native')
 
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "markdown", "go", "rust", "cpp" },
+	ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "markdown", "go", "rust", "cpp" },
 
-  sync_install = false,
+	sync_install = false,
 
-  auto_install = true,
+	auto_install = true,
 
-  highlight = {
-    enable = true,
+	highlight = {
+		enable = true,
 
-    additional_vim_regex_highlighting = false,
-  },
-  indent = {
-	  enable = true,
-  }
+		additional_vim_regex_highlighting = false,
+	},
+	indent = {
+		enable = true,
+	}
 }
 
 require("nvim-surround").setup({})
@@ -93,36 +93,36 @@ vim.keymap.set('n', '<leader>fd', builtin.diagnostics, {})
 vim.keymap.set('n', '<leader>fs', builtin.treesitter, {})
 
 require'nvim-web-devicons'.setup {
- color_icons = true;
- default = true;
- strict = true;
- override_by_filename = {
-  [".gitignore"] = {
-    icon = "",
-    color = "#f1502f",
-    name = "Gitignore"
-  }
- };
- -- same as `override` but specifically for overrides by extension
- -- takes effect when `strict` is true
- override_by_extension = {
-  ["log"] = {
-    icon = "",
-    color = "#81e043",
-    name = "Log"
-  }
- };
+	color_icons = true;
+	default = true;
+	strict = true;
+	override_by_filename = {
+		[".gitignore"] = {
+			icon = "",
+			color = "#f1502f",
+			name = "Gitignore"
+		}
+	};
+	-- same as `override` but specifically for overrides by extension
+	-- takes effect when `strict` is true
+	override_by_extension = {
+		["log"] = {
+			icon = "",
+			color = "#81e043",
+			name = "Log"
+		}
+	};
 }
 local npairs = require("nvim-autopairs")
 local Rule = require('nvim-autopairs.rule')
 
 npairs.setup({
-    check_ts = true,
-    ts_config = {
-        lua = {'string'},-- it will not add a pair on that treesitter node
-        javascript = {'template_string'},
-        java = false,-- don't check treesitter on java
-    }
+	check_ts = true,
+	ts_config = {
+		lua = {'string'},-- it will not add a pair on that treesitter node
+		javascript = {'template_string'},
+		java = false,-- don't check treesitter on java
+	}
 })
 
 local ts_conds = require('nvim-autopairs.ts-conds')
@@ -130,10 +130,10 @@ local ts_conds = require('nvim-autopairs.ts-conds')
 
 -- press % => %% only while inside a comment or string
 npairs.add_rules({
-  Rule("%", "%", "lua")
-    :with_pair(ts_conds.is_ts_node({'string','comment'})),
-  Rule("$", "$", "lua")
-    :with_pair(ts_conds.is_not_ts_node({'function'}))
+	Rule("%", "%", "lua")
+		:with_pair(ts_conds.is_ts_node({'string','comment'})),
+	Rule("$", "$", "lua")
+		:with_pair(ts_conds.is_not_ts_node({'function'}))
 })
 function installPackages()
 	local config_dir = vim.fn['stdpath']('config')
@@ -192,26 +192,54 @@ end
 require('lualine').setup({})
 vim.api.nvim_create_user_command("Time", "pu =strftime('%a %d %b %Y')", {})
 
- 
+
 local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
 
 parser_config.nu = {
-  install_info = {
-    url = "https://github.com/nushell/tree-sitter-nu",
-    files = { "src/parser.c" },
-    branch = "main",
-  },
-  filetype = "nu",
+	install_info = {
+		url = "https://github.com/nushell/tree-sitter-nu",
+		files = { "src/parser.c" },
+		branch = "main",
+	},
+	filetype = "nu",
 }
 
 require('nvim-ts-autotag').setup({
-  opts = {
-    -- Defaults
-    enable_close = true, -- Auto close tags
-    enable_rename = true, -- Auto rename pairs of tags
-    enable_close_on_slash = true -- Auto close on trailing </
-  },
-  -- Also override individual filetype configs, these take priority.
-  -- Empty by default, useful if one of the "opts" global settings
-  -- doesn't work well in a specific filetype
+	opts = {
+		-- Defaults
+		enable_close = true, -- Auto close tags
+		enable_rename = true, -- Auto rename pairs of tags
+		enable_close_on_slash = true -- Auto close on trailing </
+	},
+	-- Also override individual filetype configs, these take priority.
+	-- Empty by default, useful if one of the "opts" global settings
+	-- doesn't work well in a specific filetype
 })
+
+vim.keymap.set('n', '<space>y', vim.cmd.UndotreeToggle)
+if vim.fn.has("persistent_undo") == 1 then
+	local target_path = vim.fn.expand('~/.undodir')
+
+	-- create the directory and any parent directories if it does not exist
+	if vim.fn.isdirectory(target_path) == 0 then
+		vim.fn.mkdir(target_path, "p", 0700)
+	end
+
+	vim.o.undodir = target_path
+	vim.o.undofile = true
+end
+
+require'nvim-treesitter.configs'.setup {
+	indent = {
+		enable = true
+	},
+	incremental_selection = {
+		enable = true,
+		keymaps = {
+			init_selection = "gnn", -- set to `false` to disable one of the mappings
+			node_incremental = "grn",
+			scope_incremental = "grc",
+			node_decremental = "grm",
+		},
+	},
+}
