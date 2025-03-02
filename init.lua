@@ -1,3 +1,28 @@
+function installPackages()
+	local config_dir = vim.fn['stdpath']('config')
+	local packagesFilePath = vim.fs.joinpath(config_dir, "packages.list")
+	local packagesFile = io.open(packagesFilePath, "r")
+	if not packagesFile then return end
+	packagesFile:close()
+	local pluginDir = ""
+	if jit.os == "Windows" then
+		pluginDir = vim.fs.joinpath(vim.env.LOCALAPPDATA, "nvim-data", "site", "pack", "frustrated", "start")
+	else
+		if vim.env.XDG_DATA_HOME then
+			pluginDir = vim.fs.joinpath(vim.env.HOME, vim.env.XDG_DATA_HOME, "nvim", "site", "pack", "frustrated", "start")
+		else
+			pluginDir = vim.fs.joinpath(vim.env.HOME, ".local", "share", "nvim", "site", "pack", "frustrated", "start")
+		end
+	end
+	for packagePath in io.lines(packagesFilePath) do
+		local packagePathSplit = {}
+		for e in vim.gsplit(packagePath, "/") do
+			packagePathSplit[#packagePathSplit + 1] = e
+		end
+		local packageName = packagePathSplit[#packagePathSplit]
+		print(os.execute("git clone --recursive "..packagePath.." "..vim.fs.joinpath(pluginDir, packageName)))
+	end
+end
 vim.g.have_nerd_font = true
 vim.o.number = true
 vim.o.relativenumber = true
@@ -7,20 +32,47 @@ vim.o.completeopt = "menu"
 vim.o.mouse = ""
 -- Setup language servers.
 local lspconfig = require('lspconfig')
-require("lspconfig").markdown_oxide.setup({
-	capabilities = capabilities, 
-	root_dir = lspconfig.util.root_pattern('.git', vim.fn.getcwd()), 
-})
-local language_servers = { "gopls", "clangd", "rust_analyzer", "vale_ls", "arduino_language_server", "html", "cssls", "zls", "openscad_lsp", "pylsp", "svelte", "htmx", "eslint"}
+local language_servers = { "gopls", "clangd", "html", "rust_analyzer", "cssls", "zls", "openscad_lsp", "ruff", "svelte", "dartls", "markdown_oxide", "biome", "ruff"}
 for _, language_server in ipairs(language_servers) do
-	lspconfig[language_server].setup {
-		capabilities = capabilities,
-	}
+	lspconfig[language_server].setup {}
 end
 
-vim.g.neovide_refresh_rate_idle = 1
+function isRecording ()
+  local reg = vim.fn.reg_recording()
+  if reg == "" then return "" end -- not recording
+  return "Macro @" .. reg
+end
 
-vim.o.guifont = "0xProto Nerd Font Mono:h14"
+
+require'lspconfig'.ts_ls.setup{
+  init_options = {
+    plugins = {
+      {
+        name = "@vue/typescript-plugin",
+        location = "/home/sandy/.local/share/pnpm/global/5/node_modules/@vue/typescript-plugin",
+        languages = {"javascript", "typescript", "vue"},
+      },
+    },
+  },
+  filetypes = {
+    "javascript",
+    "typescript",
+    "vue",
+  },
+}
+
+
+vim.g.neovide_position_animation_length = 0
+vim.g.neovide_cursor_animation_length = 0.00
+vim.g.neovide_cursor_trail_size = 0
+vim.g.neovide_cursor_animate_in_insert_mode = false
+vim.g.neovide_cursor_animate_command_line = false
+vim.g.neovide_scroll_animation_far_lines = 0
+vim.g.neovide_scroll_animation_length = 0.00
+
+
+vim.o.guifont = "0xProto Nerd Font Mono,Twemoji:h9"
+
 
 -- Global mappings.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
@@ -135,31 +187,6 @@ npairs.add_rules({
 	Rule("$", "$", "lua")
 		:with_pair(ts_conds.is_not_ts_node({'function'}))
 })
-function installPackages()
-	local config_dir = vim.fn['stdpath']('config')
-	local packagesFilePath = vim.fs.joinpath(config_dir, "packages.list")
-	local packagesFile = io.open(packagesFilePath, "r")
-	if not packagesFile then return end
-	packagesFile:close()
-	local pluginDir = ""
-	if jit.os == "Windows" then
-		pluginDir = vim.fs.joinpath(vim.env.LOCALAPPDATA, "nvim-data", "site", "pack", "frustrated", "start")
-	else
-		if vim.env.XDG_DATA_HOME then
-			pluginDir = vim.fs.joinpath(vim.env.HOME, vim.env.XDG_DATA_HOME, "nvim", "site", "pack", "frustrated", "start")
-		else
-			pluginDir = vim.fs.joinpath(vim.env.HOME, ".local", "share", "nvim", "site", "pack", "frustrated", "start")
-		end
-	end
-	for packagePath in io.lines(packagesFilePath) do
-		local packagePathSplit = {}
-		for e in vim.gsplit(packagePath, "/") do
-			packagePathSplit[#packagePathSplit + 1] = e
-		end
-		local packageName = packagePathSplit[#packagePathSplit]
-		print(os.execute("git clone --recursive "..packagePath.." "..vim.fs.joinpath(pluginDir, packageName)))
-	end
-end
 
 function updatePackages()
 	local config_dir = vim.fn['stdpath']('config')
@@ -183,13 +210,32 @@ function updatePackages()
 			packagePathSplit[#packagePathSplit + 1] = e
 		end
 		local packageName = packagePathSplit[#packagePathSplit]
-		print(os.execute("git pull --recursive "..packagePath.." "..vim.fs.joinpath(pluginDir, packageName)))
+		print(os.execute("git pull --recursive \""..packagePath.."\" \""..vim.fs.joinpath(pluginDir, packageName).."\""))
 	end
 end
 
 
 
-require('lualine').setup({})
+require('lualine').setup({
+	extensions = {'oil'},
+	sections = {
+		lualine_a = {'mode'},
+		lualine_b = {'diff', 'diagnostics'},
+		lualine_c = {isRecording},
+		lualine_x = {'encoding', 'fileformat', 'filetype'},
+		lualine_y = {'progress'},
+		lualine_z = {'location'}
+	},
+	tabline = {
+		lualine_a = {'filename'},
+		lualine_b = {'branch'},
+		lualine_c = {},
+		lualine_x = {},
+		lualine_y = {},
+		lualine_z = {'tabs'},
+	},
+})
+
 vim.api.nvim_create_user_command("Time", "pu =strftime('%a %d %b %Y')", {})
 
 
@@ -243,3 +289,51 @@ require'nvim-treesitter.configs'.setup {
 		},
 	},
 }
+
+require("typescript-tools").setup {}
+vim.o.tabstop=4
+vim.o.softtabstop=4
+vim.o.expandtab = false
+vim.o.shiftwidth = 4
+
+require('gitsigns').setup()
+require("oil").setup()
+vim.o.cmdheight=0
+
+require("lspconfig").markdown_oxide.setup({
+    -- Ensure that dynamicRegistration is enabled! This allows the LS to take into account actions like the
+    -- Create Unresolved File code action, resolving completions for unindexed code blocks, ...
+    capabilities = vim.tbl_deep_extend(
+        'force',
+        vim.lsp.protocol.make_client_capabilities(),
+        {
+            workspace = {
+                didChangeWatchedFiles = {
+                    dynamicRegistration = true,
+                },
+            },
+        }
+    ),
+})
+
+local function check_codelens_support()
+local clients = vim.lsp.get_active_clients({ bufnr = 0 })
+for _, c in ipairs(clients) do
+  if c.server_capabilities.codeLensProvider then
+    return true
+  end
+end
+return false
+end
+
+vim.api.nvim_create_autocmd({ 'TextChanged', 'InsertLeave', 'CursorHold', 'LspAttach', 'BufEnter' }, {
+buffer = bufnr,
+callback = function ()
+  if check_codelens_support() then
+    vim.lsp.codelens.refresh({bufnr = 0})
+  end
+end
+})
+-- trigger codelens refresh
+vim.api.nvim_exec_autocmds('User', { pattern = 'LspAttached' })
+
