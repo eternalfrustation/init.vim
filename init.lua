@@ -66,7 +66,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 			vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
 		end
 		if client:supports_method('textDocument/formatting') then
-			vim.keymap.set('n', '<leader>ft', function() vim.lsp.buf.format({ id = client.id }) end, {})
+			vim.keymap.set('n', '<Space>f', function() vim.lsp.buf.format({ id = client.id }) end, {})
 		end
 	end,
 })
