@@ -47,10 +47,11 @@ vim.g.neovide_cursor_animate_in_insert_mode = false
 vim.g.neovide_cursor_animate_command_line = false
 vim.g.neovide_scroll_animation_far_lines = 0
 vim.g.neovide_scroll_animation_length = 0.00
+vim.g.neovide_gamma = 0.0
+vim.g.neovide_contrast = 0
 
 
-vim.o.guifont = "0xProto Nerd Font Mono,Twemoji:h9"
-
+vim.o.guifont = "0xProto Nerd Font Mono:h10"
 vim.o.completeopt = "fuzzy,menu,noinsert,popup"
 
 
@@ -175,11 +176,21 @@ function updatePackages()
 end
 
 
+local function parrot_status()
+	local status_info = require("parrot.config").get_status_info()
+	local status = ""
+	if status_info.is_chat then
+		status = status_info.prov.chat.name
+	else
+		status = status_info.prov.command.name
+	end
+	return string.format("%s(%s)", status, status_info.model)
+end
 
 require('lualine').setup({
 	extensions = {'oil'},
 	sections = {
-		lualine_a = {'mode'},
+		lualine_a = {'mode', parrot_status},
 		lualine_b = {'diff', 'diagnostics'},
 		lualine_c = {isRecording},
 		lualine_x = {'encoding', 'fileformat', 'filetype'},
@@ -230,3 +241,11 @@ vim.o.cmdheight=0
 vim.diagnostic.config({virtual_lines = true})
 
 require("pest-vim").setup {}
+
+require("parrot").setup {
+	providers = {
+		ollama = {},
+	}
+}
+
+vim.o.shell="bash"
