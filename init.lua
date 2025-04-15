@@ -94,6 +94,9 @@ require'nvim-treesitter.configs'.setup {
 
 require("nvim-surround").setup({})
 
+local oil = require("oil")
+oil.setup()
+
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
 vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
@@ -103,6 +106,7 @@ vim.keymap.set('n', '<leader>fa', builtin.quickfix, {})
 vim.keymap.set('n', '<leader>fj', builtin.jumplist, {})
 vim.keymap.set('n', '<leader>fd', builtin.diagnostics, {})
 vim.keymap.set('n', '<leader>fs', builtin.treesitter, {})
+vim.keymap.set('n', '<leader>fo', "<CMD>Oil<Cr>", {})
 
 require'nvim-web-devicons'.setup {
 	color_icons = true;
@@ -190,7 +194,7 @@ end
 require('lualine').setup({
 	extensions = {'oil'},
 	sections = {
-		lualine_a = {'mode', parrot_status},
+		lualine_a = {'filename'},
 		lualine_b = {'diff', 'diagnostics'},
 		lualine_c = {isRecording},
 		lualine_x = {'encoding', 'fileformat', 'filetype'},
@@ -198,9 +202,9 @@ require('lualine').setup({
 		lualine_z = {'location'}
 	},
 	tabline = {
-		lualine_a = {'filename'},
+		lualine_a = {'mode'},
 		lualine_b = {'branch'},
-		lualine_c = {},
+		lualine_c = {parrot_status},
 		lualine_x = {},
 		lualine_y = {},
 		lualine_z = {'tabs'},
@@ -235,7 +239,6 @@ vim.o.expandtab = false
 vim.o.shiftwidth = 4
 
 require('gitsigns').setup()
-require("oil").setup()
 vim.o.cmdheight=0
 
 vim.diagnostic.config({virtual_lines = true})
