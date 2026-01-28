@@ -50,17 +50,6 @@ function isRecording ()
 	return "Macro @" .. reg
 end
 
-vim.g.neovide_position_animation_length = 0
-vim.g.neovide_cursor_animation_length = 0.00
-vim.g.neovide_cursor_trail_size = 0
-vim.g.neovide_cursor_animate_in_insert_mode = false
-vim.g.neovide_cursor_animate_command_line = false
-vim.g.neovide_scroll_animation_far_lines = 0
-vim.g.neovide_scroll_animation_length = 0.00
-vim.g.neovide_gamma = 0.0
-vim.g.neovide_contrast = 0
-
-
 vim.o.guifont = "0xProto Nerd Font Mono:h10"
 vim.o.completeopt = "menuone,preinsert,noselect,popup"
 
@@ -437,3 +426,82 @@ require("gruvbox").setup({
 })
 vim.cmd("colorscheme gruvbox")
 vim.keymap.set("n", "<leader>gg", "<cmd>Neogit kind=floating<cr>", { desc = "Open Neogit UI" })
+
+local ui = require("dapui")
+
+local dap = require("dap")
+
+dap.adapters.gdb = {
+  type = "executable",
+  command = "gdb",
+  args = { "--interpreter=dap", "--eval-command", "set print pretty on" }
+}
+local dap_virtual_text = require("nvim-dap-virtual-text")
+
+-- Dap Virtual Text
+dap_virtual_text.setup()
+
+dap.adapters.lldb = {
+  type = 'executable',
+  command = 'lldb-dap', -- adjust as needed, must be absolute path
+  name = 'lldb'
+}
+
+dap.configurations.zig = {
+  {
+    name = "Debug Project",
+    type = "lldb",
+    request = "launch",
+	program = '${workspaceFolder}/zig-out/bin/${workspaceFolderBasename}',
+    args = {}, -- provide arguments if needed
+    cwd = "${workspaceFolder}",
+    stopAtBeginningOfMainSubprogram = false,
+  },
+}
+
+ui.setup()
+
+
+vim.fn.sign_define("DapBreakpoint", { text = "🔴" })
+
+dap.listeners.before.attach.dapui_config = function()
+	ui.open()
+end
+dap.listeners.before.launch.dapui_config = function()
+	ui.open()
+end
+dap.listeners.before.event_terminated.dapui_config = function()
+	ui.close()
+end
+dap.listeners.before.event_exited.dapui_config = function()
+	ui.close()
+end
+
+vim.keymap.set('n', '<leader>dt', function() dap.toggle_breakpoint() end, {})
+vim.keymap.set('n', '<leader>dc', function() dap.continue() end, {})
+vim.keymap.set('n', '<leader>di', function() dap.step_into() end, {})
+vim.keymap.set('n', '<leader>do', function() dap.step_over() end, {})
+vim.keymap.set('n', '<leader>du', function() dap.step_out() end, {})
+vim.keymap.set('n', '<leader>dr', function() dap.repl.open() end, {})
+vim.keymap.set('n', '<leader>dl', function() dap.run_last() end, {})
+vim.keymap.set('n', '<leader>dq', function() 
+	dap.terminate()
+	ui.close()
+	dap_virtual_text.toggle()
+
+end, {})
+vim.keymap.set('n', '<leader>db', function() dap.list_breakpoints() end, {})
+vim.keymap.set('n', '<leader>de', function() dap.set_exception_breakpoints({"all"}) end, {})
+vim.keymap.set('n', '<leader>dv', function() ui.elements.watches.add(vim.fn.expand('<cword>')) end, {})
+
+
+require("avante").setup({
+	auto_suggestions_provider = "ollama",
+	provider = "ollama",
+	providers = {
+		ollama = {
+			model = "novaforgeai/starcoder2:3b-optimized",
+			is_env_set = require("avante.providers.ollama").check_endpoint_alive,
+		}
+	}
+})
