@@ -1,37 +1,39 @@
-function installPackages()
-	local config_dir = vim.fn['stdpath']('config')
-	local packagesFilePath = vim.fs.joinpath(config_dir, "packages.list")
-	local packagesFile = io.open(packagesFilePath, "r")
-	if not packagesFile then return end
-	packagesFile:close()
-	local pluginDir = ""
-	if jit.os == "Windows" then
-		pluginDir = vim.fs.joinpath(vim.env.LOCALAPPDATA, "nvim-data", "site", "pack", "frustrated", "start")
-	else
-		if vim.env.XDG_DATA_HOME then
-			pluginDir = vim.fs.joinpath(vim.env.HOME, vim.env.XDG_DATA_HOME, "nvim", "site", "pack", "frustrated", "start")
-		else
-			pluginDir = vim.fs.joinpath(vim.env.HOME, ".local", "share", "nvim", "site", "pack", "frustrated", "start")
-		end
-	end
-	for packagePath in io.lines(packagesFilePath) do
-		local spaceIterator = vim.gsplit(packagePath, " ")
-		local path = spaceIterator()
-		local folders = {}
-		local packagePathSplit = {}
-		for e in spaceIterator do
-			folders[#folders + 1] = e
-		end
+vim.o.guifont = "0xProto Nerd Font Mono:h10"
+vim.g.neovide_cursor_animation_length=0.0
+vim.g.neovide_cursor_vfx_mode = "railgun"
+vim.g.neovide_position_animation_length = 0
+vim.g.neovide_scroll_animation_length = 0
 
-		for e in vim.gsplit(path, "/") do
-			packagePathSplit[#packagePathSplit + 1] = e
-		end
-		local packageName = packagePathSplit[#packagePathSplit]
-		local fsPath = vim.fs.joinpath(pluginDir, packageName)
-
-		print(os.execute("git clone --recursive "..path.." "..fsPath))
-	end
-end
+vim.pack.add{
+	{ src = 'https://github.com/kylechui/nvim-surround' },
+	{ src = 'https://github.com/neovim/nvim-lspconfig' },
+	{ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' },
+	{ src = 'https://github.com/nvim-telescope/telescope-fzy-native.nvim' },
+	{ src = 'https://github.com/nvim-telescope/telescope.nvim' },
+	{ src = 'https://github.com/nvim-lua/plenary.nvim' },
+	{ src = 'https://github.com/nvim-tree/nvim-web-devicons' },
+	{ src = 'https://github.com/nvim-lualine/lualine.nvim' },
+	{ src = 'https://github.com/windwp/nvim-ts-autotag' },
+	{ src = 'https://github.com/lewis6991/gitsigns.nvim' },
+	{ src = 'https://github.com/stevearc/oil.nvim' },
+	{ src = 'https://github.com/MunifTanjim/nui.nvim' },
+	{ src = 'https://github.com/nvim-treesitter/nvim-treesitter-context' },
+	{ src = 'https://github.com/nvim-lua/popup.nvim' },
+	{ src = 'https://github.com/jvgrootveld/telescope-zoxide' },
+	{ src = 'https://github.com/mcauley-penney/visual-whitespace.nvim' },
+	{ src = 'https://github.com/ellisonleao/gruvbox.nvim' },
+	{ src = 'https://github.com/illia-shkroba/telescope-completion.nvim' },
+	{ src = 'https://github.com/sindrets/diffview.nvim' },
+	{ src = 'https://github.com/mfussenegger/nvim-dap' },
+	{ src = 'https://github.com/nvim-neotest/nvim-nio' },
+	{ src = 'https://github.com/rcarriga/nvim-dap-ui' },
+	{ src = 'https://github.com/theHamsta/nvim-dap-virtual-text' },
+	{ src = 'https://github.com/catppuccin/nvim' },
+	{ src = 'https://github.com/m4xshen/hardtime.nvim' },
+	{ src = 'https://github.com/yetone/avante.nvim' },
+	{ src = 'https://github.com/MeanderingProgrammer/render-markdown.nvim' },
+	{ src = 'https://github.com/chomosuke/typst-preview.nvim' },
+}
 
 require(".lsp")
 
@@ -42,7 +44,6 @@ vim.o.background = "dark"
 vim.o.shell = "bash"
 
 vim.o.mouse = ""
--- Setup language servers.
 
 function isRecording ()
 	local reg = vim.fn.reg_recording()
@@ -50,26 +51,10 @@ function isRecording ()
 	return "Macro @" .. reg
 end
 
-vim.o.guifont = "0xProto Nerd Font Mono:h10"
-vim.o.completeopt = "menuone,preinsert,noselect,popup"
+vim.o.completeopt = "menu,popup,fuzzy,noinsert"
 
 -- Global mappings.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
-
--- Use LspAttach autocommand to only map the following keys
--- after the language server attaches to the current buffer
-vim.api.nvim_create_autocmd('LspAttach', {
-	callback = function(ev)
-		local client = vim.lsp.get_client_by_id(ev.data.client_id)
-		if client:supports_method('textDocument/completion') then
-			vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-		end
-
-		if client:supports_method('textDocument/formatting') then
-			vim.keymap.set('n', '<Space>f', function() vim.lsp.buf.format({ id = client.id }) end, {})
-		end
-	end,
-})
 local z_utils = require("telescope._extensions.zoxide.utils")
 
 require('telescope').setup{
@@ -97,30 +82,36 @@ require('telescope').setup{
 }
 
 
+local treesitter_lang = { "c", "lua", "vim", "vimdoc", "query", "markdown", "go", "rust", "cpp" }
 
-require'nvim-treesitter.configs'.setup {
-	ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "markdown", "go", "rust", "cpp" },
+local treesitter = require'nvim-treesitter'
+treesitter.setup {}
+treesitter.install(treesitter_lang)
 
-	sync_install = false,
-
-	auto_install = true,
-
-	highlight = {
-		enable = true,
-
-		additional_vim_regex_highlighting = false,
-	},
-	indent = {
-		enable = true,
-	}
-}
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = treesitter_lang,
+  callback = function() vim.treesitter.start() end,
+})
 
 require("nvim-surround").setup({})
 
+-- Declare a global function to retrieve the current directory
+function _G.get_oil_winbar()
+  local bufnr = vim.api.nvim_win_get_buf(vim.g.statusline_winid)
+  local dir = require("oil").get_current_dir(bufnr)
+  if dir then
+    return vim.fn.fnamemodify(dir, ":~")
+  else
+    -- If there is no current directory (e.g. over ssh), just show the buffer name
+    return vim.api.nvim_buf_get_name(0)
+  end
+end
+
 local oil = require("oil")
 oil.setup({
-	watch_for_changes = true,
-	constrain_cursor = "name",
+  win_options = {
+    winbar = "%!v:lua.get_oil_winbar()",
+  },
 })
 
 local telescope = require('telescope')
@@ -137,6 +128,7 @@ vim.keymap.set('n', '<leader>fa', telescope_builtin.quickfix, {})
 vim.keymap.set('n', '<leader>fj', telescope_builtin.jumplist, {})
 vim.keymap.set('n', '<leader>fd', telescope_builtin.diagnostics, {})
 vim.keymap.set('n', '<leader>fs', telescope_builtin.treesitter, {})
+vim.keymap.set('n', '<leader>fr', telescope_builtin.resume, {})
 vim.keymap.set("n", "<leader>pp", telescope_builtin.builtin, {})
 vim.keymap.set('n', '<leader>fo', "<CMD>Oil --float<Cr>", {})
 vim.keymap.set("n", "<leader>cd", telescope.extensions.zoxide.list)
@@ -164,33 +156,6 @@ require'nvim-web-devicons'.setup {
 	};
 }
 
-function updatePackages()
-	local config_dir = vim.fn['stdpath']('config')
-	local packagesFilePath = vim.fs.joinpath(config_dir, "packages.list")
-	local packagesFile = io.open(packagesFilePath, "r")
-	if not packagesFile then return end
-	packagesFile:close()
-	local pluginDir = ""
-	if jit.os == "Windows" then
-		pluginDir = vim.fs.joinpath(vim.env.LOCALAPPDATA, "nvim-data", "site", "pack", "frustrated", "start")
-	else
-		if vim.env.XDG_DATA_HOME then
-			pluginDir = vim.fs.joinpath(vim.env.HOME, vim.env.XDG_DATA_HOME, "nvim", "site", "pack", "frustrated", "start")
-		else
-			pluginDir = vim.fs.joinpath(vim.env.HOME, ".local", "share", "nvim", "site", "pack", "frustrated", "start")
-		end
-	end
-	for packagePath in io.lines(packagesFilePath) do
-		local packagePathSplit = {}
-		for e in vim.gsplit(packagePath, "/") do
-			packagePathSplit[#packagePathSplit + 1] = e
-		end
-		local packageName = packagePathSplit[#packagePathSplit]
-		print(os.execute("git pull --recursive \""..packagePath.."\" \""..vim.fs.joinpath(pluginDir, packageName).."\""))
-	end
-end
-
-
 require('lualine').setup({
 	extensions = {'oil'},
 	sections = {
@@ -211,8 +176,6 @@ require('lualine').setup({
 	},
 })
 
-vim.api.nvim_create_user_command("Time", "pu =strftime('%a %d %b %Y')", {})
-
 vim.keymap.set('n', '<leader>rg', function() 
 	vim.ui.input({prompt="Rg: "}, 
 		function(input)
@@ -223,8 +186,6 @@ vim.keymap.set('n', '<leader>rg', function()
 		end
 	)
 end)
-
-local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
 
 require('nvim-ts-autotag').setup({
 	opts = {
@@ -237,12 +198,6 @@ require('nvim-ts-autotag').setup({
 	-- Empty by default, useful if one of the "opts" global settings
 	-- doesn't work well in a specific filetype
 })
-
-require'nvim-treesitter.configs'.setup {
-	indent = {
-		enable = true
-	},
-}
 
 vim.o.tabstop=4
 vim.o.softtabstop=4
@@ -270,162 +225,15 @@ require'treesitter-context'.setup{
 	on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
 }
 
-require'nvim-treesitter.configs'.setup {
-	textobjects = {
-		select = {
-			enable = true,
-
-			-- Automatically jump forward to textobj, similar to targets.vim
-			lookahead = true,
-
-			keymaps = {
-				-- You can use the capture groups defined in textobjects.scm
-				["af"] = "@function.outer",
-				["if"] = "@function.inner",
-				["ac"] = "@class.outer",
-				-- You can optionally set descriptions to the mappings (used in the desc parameter of
-				-- nvim_buf_set_keymap) which plugins like which-key display
-				["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
-				-- You can also use captures from other query groups like `locals.scm`
-				["as"] = { query = "@local.scope", query_group = "locals", desc = "Select language scope" },
-			},
-
-			selection_modes = {
-				['@parameter.outer'] = 'v', -- charwise
-				['@function.outer'] = 'V', -- linewise
-				['@class.outer'] = '<c-v>', -- blockwise
-			},
-		},
-		lsp_interop = {
-			enable = true,
-			floating_preview_opts = {},
-			peek_definition_code = {
-				["<leader>df"] = "@function.outer",
-				["<leader>dF"] = "@class.outer",
-			},
-		},
-		swap = {
-			enable = true,
-			swap_previous = {
-				["<leader>A"] = "@parameter.inner",
-			},
-			swap_next = {
-				["<leader>a"] = "@parameter.inner",
-			},
-		},
-
-		move = {
-			enable = true,
-			set_jumps = true, -- whether to set jumps in the jumplist
-			goto_next_start = {
-				["]m"] = "@function.outer",
-				["]]"] = { query = "@class.outer", desc = "Next class start" },
-				["]x"] = { query = "@parameter.inner", desc = "Next parameter" },
-				--
-				-- You can use regex matching (i.e. lua pattern) and/or pass a list in a "query" key to group multiple queries.
-				["]o"] = "@loop.*",
-				-- ["]o"] = { query = { "@loop.inner", "@loop.outer" } }
-				--
-				-- You can pass a query group to use query from `queries/<lang>/<query_group>.scm file in your runtime path.
-				-- Below example nvim-treesitter's `locals.scm` and `folds.scm`. They also provide highlights.scm and indent.scm.
-				["]s"] = { query = "@local.scope", query_group = "locals", desc = "Next scope" },
-				["]z"] = { query = "@fold", query_group = "folds", desc = "Next fold" },
-			},
-			goto_next_end = {
-				["]M"] = "@function.outer",
-				["]["] = "@class.outer",
-			},
-			goto_previous_start = {
-				["[m"] = "@function.outer",
-				["[["] = "@class.outer",
-				["[x"] = { query = "@parameter.inner", desc = "Previous parameter start" },
-			},
-			goto_previous_end = {
-				["[M"] = "@function.outer",
-				["[]"] = "@class.outer",
-			},
-			-- Below will go to either the start or the end, whichever is closer.
-			-- Use if you want more granular movements
-			-- Make it even more gradual by adding multiple queries and regex.
-			goto_next = {
-				["]d"] = "@conditional.outer",
-			},
-			goto_previous = {
-				["[d"] = "@conditional.outer",
-			}
-		},
-		lsp_interop = {
-			enable = true,
-			border = 'none',
-			floating_preview_opts = {},
-			peek_definition_code = {
-				["<leader>df"] = "@function.outer",
-				["<leader>dF"] = "@class.outer",
-			},
-		},
-		select = {
-			enable = true,
-
-			-- Automatically jump forward to textobj, similar to targets.vim
-			lookahead = true,
-
-			keymaps = {
-				-- You can use the capture groups defined in textobjects.scm
-				["af"] = "@function.outer",
-				["if"] = "@function.inner",
-				["aa"] = "@parameter.outer",
-				["ia"] = "@parameter.inner",
-				["ac"] = "@class.outer",
-				-- You can optionally set descriptions to the mappings (used in the desc parameter of
-				-- nvim_buf_set_keymap) which plugins like which-key display
-				["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
-				-- You can also use captures from other query groups like `locals.scm`
-				["as"] = { query = "@local.scope", query_group = "locals", desc = "Select language scope" },
-			},
-			-- You can choose the select mode (default is charwise 'v')
-			--
-			-- Can also be a function which gets passed a table with the keys
-			-- * query_string: eg '@function.inner'
-			-- * method: eg 'v' or 'o'
-			-- and should return the mode ('v', 'V', or '<c-v>') or a table
-			-- mapping query_strings to modes.
-			selection_modes = {
-				['@parameter.outer'] = 'v', -- charwise
-				['@function.outer'] = 'V', -- linewise
-				['@class.outer'] = '<c-v>', -- blockwise
-			},
-		},
-	},
-}
-
-vim.lsp.config('ty', {
-  settings = {
-    ty = {
-      diagnosticMode = 'workspace',
-      experimental = {
-        autoImport = true,
-      },
-    },
-  },
-})
-
 vim.lsp.inlay_hint.enable()
 
 local completion = require("telescope").load_extension("completion")
 
-vim.keymap.set("i", [[<C-z>]], function()
-  if vim.fn.pumvisible() == 1 then
-	return completion.completion_expr()
-  else
-	return [[<C-z>]]
-  end
-end, { expr = true, desc = "List popup-menu completion in Telescope" })
-
 require("gruvbox").setup({
   contrast = "hard", -- can be "hard", "soft" or empty string
 })
+
 vim.cmd("colorscheme gruvbox")
-vim.keymap.set("n", "<leader>gg", "<cmd>Neogit kind=floating<cr>", { desc = "Open Neogit UI" })
 
 local ui = require("dapui")
 
@@ -457,6 +265,37 @@ dap.configurations.zig = {
     cwd = "${workspaceFolder}",
     stopAtBeginningOfMainSubprogram = false,
   },
+}
+
+dap.adapters.delve = {
+  type = 'server',
+  port = '${port}',
+  executable = {
+    command = 'dlv',
+    args = {'dap', '-l', '127.0.0.1:${port}', "--log", "--log-output=dap"},
+  }
+}
+
+dap.configurations.go = {
+	{
+    type = "delve",
+    name = "Debug Current File",
+    request = "launch",
+    program = "${file}",
+  },
+  {
+    type = "delve",
+    name = "Debug Test",
+    request = "launch",
+    mode = "test",
+    program = "${file}",
+  },
+  {
+    type = "delve",
+    name = "Debug Entire Package",
+    request = "launch",
+    program = "${workspaceFolder}",
+  }
 }
 
 ui.setup()
@@ -494,14 +333,33 @@ vim.keymap.set('n', '<leader>db', function() dap.list_breakpoints() end, {})
 vim.keymap.set('n', '<leader>de', function() dap.set_exception_breakpoints({"all"}) end, {})
 vim.keymap.set('n', '<leader>dv', function() ui.elements.watches.add(vim.fn.expand('<cword>')) end, {})
 
+require("hardtime").setup()
 
-require("avante").setup({
-	auto_suggestions_provider = "ollama",
-	provider = "ollama",
-	providers = {
-		ollama = {
-			model = "novaforgeai/starcoder2:3b-optimized",
-			is_env_set = require("avante.providers.ollama").check_endpoint_alive,
-		}
-	}
+require("render-markdown").setup({
+	file_types = { "markdown" },
 })
+
+
+vim.api.nvim_create_autocmd('LspAttach', {
+	group = vim.api.nvim_create_augroup('my.lsp', {}),
+	callback = function(ev)
+		local client = assert(vim.lsp.get_client_by_id(ev.data.client_id))
+		if client:supports_method('textDocument/completion') then
+			vim.lsp.completion.enable(true, client.id, ev.buf, {
+				autotrigger = true,
+			} )
+		end
+		if not client:supports_method('textDocument/willSaveWaitUntil')
+			and client:supports_method('textDocument/formatting') then
+			vim.api.nvim_create_autocmd('BufWritePre', {
+				group = vim.api.nvim_create_augroup('my.lsp', {clear=false}),
+				buffer = ev.buf,
+				callback = function()
+					vim.lsp.buf.format({ bufnr = ev.buf, id = client.id, timeout_ms = 1000 })
+				end,
+			})
+		end
+	end,
+})
+
+require("typst-preview").setup()

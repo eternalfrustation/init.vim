@@ -5,6 +5,7 @@ local vue_plugin = {
   languages = { 'vue' },
   configNamespace = 'typescript',
 }
+
 vim.lsp.config('vtsls', {
   settings = {
     vtsls = {
@@ -16,6 +17,36 @@ vim.lsp.config('vtsls', {
     },
   },
   filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+})
+
+vim.lsp.config('ty', {
+  settings = {
+    ty = {
+      diagnosticMode = 'workspace',
+      experimental = {
+        autoImport = true,
+      },
+    },
+  },
+})
+
+
+vim.lsp.config('dartls', {
+	settings = {
+		dart = {
+			enableSdkFormatter = true,
+			enableSnippets = true,
+
+		},
+	},
+})
+
+vim.lsp.config('gopls', {
+	settings = {
+		gopls = {
+			gofumpt = true,
+		},
+	},
 })
 
 vim.lsp.enable("rust_analyzer")
@@ -34,5 +65,5 @@ vim.lsp.enable("templ")
 vim.lsp.enable("jsonls")
 vim.lsp.enable("gdscript")
 vim.lsp.enable("ty")
-
-
+vim.lsp.enable("openscad_lsp")
+vim.lsp.enable("ols")
